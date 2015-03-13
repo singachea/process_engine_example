@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://activiti.org/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_YGb0UMfcEeSDkOcfN0OMiQ" exporter="camunda modeler" exporterVersion="2.7.0" targetNamespace="http://activiti.org/bpmn">
+  <bpmn2:process id="Process_1" isExecutable="false">
+    <bpmn2:startEvent id="start_process" name="Accountant activate">
+      <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:sequenceFlow id="SequenceFlow_1" name="" sourceRef="start_process" targetRef="process_appointment"/>
+    <bpmn2:userTask id="process_appointment" camunda:candidateGroups="developer" name=" make appointment (dev/owner)">
+      <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
+      <bpmn2:incoming>handover_gateway_cancel_flow</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_4</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:sequenceFlow id="SequenceFlow_4" name="" sourceRef="process_appointment" targetRef="handover_checklist"/>
+    <bpmn2:userTask id="handover_checklist" camunda:candidateGroups="developer" name="Do Handover Checklist (dev)">
+      <bpmn2:incoming>SequenceFlow_4</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_5</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:sequenceFlow id="SequenceFlow_5" name="" sourceRef="handover_checklist" targetRef="handover_gateway"/>
+    <bpmn2:exclusiveGateway id="handover_gateway" default="handover_gateway_submit_flow">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property value="handover_gateway_cancel_flow" name="cancel"/>
+          <camunda:property value="handover_gateway_submit_flow" name="submit"/>
+        </camunda:properties>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>SequenceFlow_5</bpmn2:incoming>
+      <bpmn2:outgoing>handover_gateway_cancel_flow</bpmn2:outgoing>
+      <bpmn2:outgoing>handover_gateway_submit_flow</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:sequenceFlow id="handover_gateway_cancel_flow" name="Cancel" sourceRef="handover_gateway" targetRef="process_appointment"/>
+    <bpmn2:sequenceFlow id="handover_gateway_submit_flow" name="Submit" sourceRef="handover_gateway" targetRef="defect_report"/>
+    <bpmn2:userTask id="defect_report" name="Do Defect Report (owner)">
+      <bpmn2:incoming>handover_gateway_submit_flow</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_7</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:sequenceFlow id="SequenceFlow_7" name="" sourceRef="defect_report" targetRef="defect_appointment"/>
+    <bpmn2:userTask id="defect_validation" camunda:candidateGroups="developer" name="Validate detects ( dev)">
+      <bpmn2:incoming>SequenceFlow_8</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_9</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:sequenceFlow id="SequenceFlow_9" name="" sourceRef="defect_validation" targetRef="defect_validation_gateway"/>
+    <bpmn2:userTask id="defect_appointment" camunda:candidateGroups="developer" name="make appointment (dev/owner)">
+      <bpmn2:incoming>SequenceFlow_7</bpmn2:incoming>
+      <bpmn2:incoming>defect_gateway_cancel_flow</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_8</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:sequenceFlow id="SequenceFlow_8" name="" sourceRef="defect_appointment" targetRef="defect_validation"/>
+    <bpmn2:userTask id="fix_defect" camunda:candidateGroups="contractor" name="Fix defect (contractor)">
+      <bpmn2:incoming>defect_gateway_submit_flow</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_12</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:sequenceFlow id="SequenceFlow_12" name="" sourceRef="fix_defect" targetRef="accept_fix"/>
+    <bpmn2:exclusiveGateway id="defect_validation_gateway" default="defect_gateway_submit_flow">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property value="defect_gateway_cancel_flow" name="cancel"/>
+          <camunda:property value="defect_gateway_submit_flow" name="submit"/>
+        </camunda:properties>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>SequenceFlow_9</bpmn2:incoming>
+      <bpmn2:outgoing>defect_gateway_cancel_flow</bpmn2:outgoing>
+      <bpmn2:outgoing>defect_gateway_submit_flow</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:sequenceFlow id="defect_gateway_cancel_flow" name="Cancel" sourceRef="defect_validation_gateway" targetRef="defect_appointment"/>
+    <bpmn2:sequenceFlow id="defect_gateway_submit_flow" name="submit" sourceRef="defect_validation_gateway" targetRef="fix_defect"/>
+    <bpmn2:userTask id="accept_fix" camunda:candidateGroups="developer" name="Accept Fix (dev/owner)">
+      <bpmn2:incoming>SequenceFlow_12</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_13</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:sequenceFlow id="SequenceFlow_13" name="" sourceRef="accept_fix" targetRef="end_process"/>
+    <bpmn2:endEvent id="end_process">
+      <bpmn2:incoming>SequenceFlow_13</bpmn2:incoming>
+    </bpmn2:endEvent>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_4" bpmnElement="start_process">
+        <dc:Bounds height="36.0" width="36.0" x="145.0" y="162.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_UserTask_15" bpmnElement="process_appointment">
+        <dc:Bounds height="80.0" width="100.0" x="288.0" y="140.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_StartEvent_4" targetElement="_BPMNShape_UserTask_15">
+        <di:waypoint xsi:type="dc:Point" x="181.0" y="180.0"/>
+        <di:waypoint xsi:type="dc:Point" x="288.0" y="180.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="6.0" width="6.0" x="203.0" y="180.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_ExclusiveGateway_2" bpmnElement="handover_gateway" isMarkerVisible="true">
+        <dc:Bounds height="50.0" width="50.0" x="622.0" y="154.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="0.0" width="0.0" x="647.0" y="209.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="handover_gateway_cancel_flow" sourceElement="_BPMNShape_ExclusiveGateway_2" targetElement="_BPMNShape_UserTask_15">
+        <di:waypoint xsi:type="dc:Point" x="647.0" y="154.0"/>
+        <di:waypoint xsi:type="dc:Point" x="647.0" y="66.0"/>
+        <di:waypoint xsi:type="dc:Point" x="337.0" y="66.0"/>
+        <di:waypoint xsi:type="dc:Point" x="338.0" y="140.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="17.0" width="38.0" x="603.0" y="96.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_UserTask_16" bpmnElement="handover_checklist">
+        <dc:Bounds height="80.0" width="100.0" x="456.0" y="140.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_4" bpmnElement="SequenceFlow_4" sourceElement="_BPMNShape_UserTask_15" targetElement="_BPMNShape_UserTask_16">
+        <di:waypoint xsi:type="dc:Point" x="388.0" y="180.0"/>
+        <di:waypoint xsi:type="dc:Point" x="456.0" y="180.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="6.0" width="6.0" x="410.0" y="180.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_5" bpmnElement="SequenceFlow_5" sourceElement="_BPMNShape_UserTask_16" targetElement="_BPMNShape_ExclusiveGateway_2">
+        <di:waypoint xsi:type="dc:Point" x="556.0" y="180.0"/>
+        <di:waypoint xsi:type="dc:Point" x="569.0" y="180.0"/>
+        <di:waypoint xsi:type="dc:Point" x="569.0" y="179.0"/>
+        <di:waypoint xsi:type="dc:Point" x="622.0" y="179.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="6.0" width="6.0" x="583.0" y="179.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_UserTask_17" bpmnElement="defect_report">
+        <dc:Bounds height="80.0" width="100.0" x="145.0" y="300.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_6" bpmnElement="handover_gateway_submit_flow" sourceElement="_BPMNShape_ExclusiveGateway_2" targetElement="_BPMNShape_UserTask_17">
+        <di:waypoint xsi:type="dc:Point" x="646.0" y="204.0"/>
+        <di:waypoint xsi:type="dc:Point" x="645.0" y="249.0"/>
+        <di:waypoint xsi:type="dc:Point" x="192.0" y="248.0"/>
+        <di:waypoint xsi:type="dc:Point" x="194.0" y="300.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="17.0" width="38.0" x="603.0" y="228.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_UserTask_18" bpmnElement="defect_appointment">
+        <dc:Bounds height="80.0" width="100.0" x="315.0" y="300.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_7" bpmnElement="SequenceFlow_7" sourceElement="_BPMNShape_UserTask_17" targetElement="_BPMNShape_UserTask_18">
+        <di:waypoint xsi:type="dc:Point" x="245.0" y="340.0"/>
+        <di:waypoint xsi:type="dc:Point" x="315.0" y="340.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="6.0" width="6.0" x="267.0" y="340.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_UserTask_19" bpmnElement="defect_validation">
+        <dc:Bounds height="80.0" width="100.0" x="465.0" y="300.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_8" bpmnElement="SequenceFlow_8" sourceElement="_BPMNShape_UserTask_18" targetElement="_BPMNShape_UserTask_19">
+        <di:waypoint xsi:type="dc:Point" x="415.0" y="340.0"/>
+        <di:waypoint xsi:type="dc:Point" x="465.0" y="340.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="6.0" width="6.0" x="437.0" y="340.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_ExclusiveGateway_3" bpmnElement="defect_validation_gateway" isMarkerVisible="true">
+        <dc:Bounds height="50.0" width="50.0" x="615.0" y="315.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="0.0" width="0.0" x="640.0" y="370.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_9" bpmnElement="SequenceFlow_9" sourceElement="_BPMNShape_UserTask_19" targetElement="_BPMNShape_ExclusiveGateway_3">
+        <di:waypoint xsi:type="dc:Point" x="565.0" y="340.0"/>
+        <di:waypoint xsi:type="dc:Point" x="615.0" y="340.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="6.0" width="6.0" x="587.0" y="344.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_10" bpmnElement="defect_gateway_cancel_flow" sourceElement="_BPMNShape_ExclusiveGateway_3" targetElement="_BPMNShape_UserTask_18">
+        <di:waypoint xsi:type="dc:Point" x="640.0" y="365.0"/>
+        <di:waypoint xsi:type="dc:Point" x="640.0" y="452.0"/>
+        <di:waypoint xsi:type="dc:Point" x="365.0" y="452.0"/>
+        <di:waypoint xsi:type="dc:Point" x="365.0" y="380.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="17.0" width="38.0" x="603.0" y="408.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_UserTask_20" bpmnElement="fix_defect">
+        <dc:Bounds height="80.0" width="100.0" x="715.0" y="300.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_11" bpmnElement="defect_gateway_submit_flow" sourceElement="_BPMNShape_ExclusiveGateway_3" targetElement="_BPMNShape_UserTask_20">
+        <di:waypoint xsi:type="dc:Point" x="665.0" y="340.0"/>
+        <di:waypoint xsi:type="dc:Point" x="715.0" y="340.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="17.0" width="36.0" x="665.0" y="315.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_UserTask_21" bpmnElement="accept_fix">
+        <dc:Bounds height="80.0" width="100.0" x="715.0" y="157.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_12" bpmnElement="SequenceFlow_12" sourceElement="_BPMNShape_UserTask_20" targetElement="_BPMNShape_UserTask_21">
+        <di:waypoint xsi:type="dc:Point" x="765.0" y="300.0"/>
+        <di:waypoint xsi:type="dc:Point" x="765.0" y="237.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="6.0" width="6.0" x="762.0" y="275.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_4" bpmnElement="end_process">
+        <dc:Bounds height="36.0" width="36.0" x="949.0" y="179.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="0.0" width="0.0" x="967.0" y="220.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_13" bpmnElement="SequenceFlow_13" sourceElement="_BPMNShape_UserTask_21" targetElement="_BPMNShape_EndEvent_4">
+        <di:waypoint xsi:type="dc:Point" x="815.0" y="197.0"/>
+        <di:waypoint xsi:type="dc:Point" x="949.0" y="197.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="6.0" width="6.0" x="837.0" y="197.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>
