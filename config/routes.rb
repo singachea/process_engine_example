@@ -14,6 +14,7 @@ Rails.application.routes.draw do
 
       resources :check_lists, only: [:create] do
         member do
+          post :activate
           post :make_appointment
           post :handover
         end

@@ -22,5 +22,20 @@ module Testtuansing
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
+
+    config.after_initialize do
+      # should check the format node_data_injection
+      (ProcessEngine::NodeDataInjection.injected_classes || []).each do |icl|
+        methods = %i(process_definition_slug implemented_node_ids forward_implementation_method).each do |method|
+          fail "You need to implement class method `#{method.to_s}` in #{icl}" unless icl.respond_to?(method)
+        end
+      end
+
+    end
+
+    config.to_prepare do
+      ProcessEngine::NodeDataInjection.injected_classes = [AppointmentHook]
+    end
+
   end
 end
