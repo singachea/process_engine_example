@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-
+source 'https://rails-assets.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.0'
@@ -43,4 +43,6 @@ group :development, :test do
   gem 'spring'
 end
 
-gem 'process_engine', path: '/Users/ream/Projects/process_engine'
+# gem 'process_engine', path: '/Users/ream/Projects/process_engine'
+gem 'process_engine', git: 'git@github.com:singachea/process_engine.git', branch: 'develop'
+# gem 'process_engine' # get it from rubygems
