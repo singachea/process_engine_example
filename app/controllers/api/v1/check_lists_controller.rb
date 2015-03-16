@@ -13,7 +13,10 @@ class Api::V1::CheckListsController < Api::ApiController
     # get data, save in db, blah blah, ....
     # some work and validation or whatever here
     finisher = "user_#{@user.id}"
-    ProcessEngine::ProcessQuery.task_complete(params[:id], verified_state: 'process_appointment', finisher: finisher)
+    ProcessEngine::ProcessQuery.task_complete params[:id],
+                                              verified_state: 'process_appointment',
+                                              finisher: finisher,
+                                              data: { handover_gateway_choice: ["cancel", "submit"].sample }
     render json: { status: 'success' }
   end
 

@@ -23,7 +23,8 @@ class AppointmentHook
     end
 
     def implement_handover_gateway(process_instance_object)
-      value = ["cancel", "submit"].sample
+      task = process_instance_object.last_process_task_by_state_name("process_appointment")
+      value = task.data["handover_gateway_choice"] || ["cancel", "submit"].sample
       { exclusive_gateway_choice_value: value } # return this node option here
     end
 
