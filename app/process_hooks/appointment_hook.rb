@@ -7,7 +7,7 @@ class AppointmentHook
 
     # [required] to tell what to implement
     def implemented_node_ids
-      [:process_appointment]
+      [:process_appointment, :handover_gateway]
     end
 
     # [required] to forward the implementation
@@ -20,6 +20,11 @@ class AppointmentHook
     def implement_process_appointment(process_instance_object)
       # { assignee: "random_assignee", candidate_users: ["chea", "lim"], candidate_groups: ["sale", "marketing"] } # return this node option here
       { assignee: "reamream"}
+    end
+
+    def implement_handover_gateway(process_instance_object)
+      value = ["cancel", "submit"].sample
+      { exclusive_gateway_choice_value: value } # return this node option here
     end
 
   end
