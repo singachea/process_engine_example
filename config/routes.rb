@@ -21,6 +21,15 @@ Rails.application.routes.draw do
       end
 
     end
+
+    namespace :v2 do
+      resources :pe_apis do
+        get :process_instance, on: :collection
+        get :process_definitions, on: :collection
+        post :process_instance_start, on: :collection
+        get :process_tasks, on: :collection
+      end
+    end
   end
 
 end

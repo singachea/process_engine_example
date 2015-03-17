@@ -41,8 +41,9 @@ group :development, :test do
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
+  gem 'pry'
 end
 
-# gem 'process_engine', path: '/Users/ream/Projects/process_engine'
-gem 'process_engine', git: 'git@github.com:singachea/process_engine.git', branch: 'develop'
+gem 'process_engine', path: '/Users/ream/Projects/process_engine'
+# gem 'process_engine', git: 'git@github.com:singachea/process_engine.git', branch: 'develop'
 # gem 'process_engine' # get it from rubygems
